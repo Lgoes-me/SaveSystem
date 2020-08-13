@@ -4,14 +4,14 @@ using UnityEngine;
 
 namespace ink.Save
 {
-    public class SaveableEntity : MonoBehaviour, ISaveable
+    public class SaveableEntity : MonoBehaviour
     {
         [SerializeField] private string _id = string.Empty;
 
         public string GetId() => _id;
 
-        [ContextMenu("Generate Id")]
-        public void SetId(string id)
+        [ContextMenu("GenerateId")]
+        public void SetId()
         {
             _id = Guid.NewGuid().ToString();
 

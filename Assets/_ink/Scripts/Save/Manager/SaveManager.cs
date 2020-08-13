@@ -1,15 +1,33 @@
 using System.Collections.Generic;
 using UnityEngine;
+using ScriptableObjectArchitecture; 
 
 namespace ink.Save
 {
-    public class SaveManager : MonoBehaviour
+    public class SaveManager : MonoBehaviour, IGameEventListener
     {
-        private SaveSystem saveSystem = new BinarySaveSystem();
+        public GameEventBase saveGameEvent;
+        private SaveSystem saveSystem;
 
+        public void OnEnable()
+        {
+            saveGameEvent.AddListener(this);
+            saveSystem = new BinarySaveSystem();
+        }
+
+        public void OnEventRaised()
+        {
+            SaveData();
+        }
+        
         private void SaveData()
         {
             var data = saveSystem.LoadFile() as Dictionary<string, object>;
+
+            if(data == null)
+            {
+                data = new Dictionary<string, object>();
+            }
 
             foreach (var saveable in FindObjectsOfType<SaveableEntity>())
             {
@@ -19,10 +37,16 @@ namespace ink.Save
             saveSystem.SaveFile(data);
         }
 
+        [ContextMenu("Load")]
         private void LoadData()
         {
             var data = saveSystem.LoadFile() as Dictionary<string, object>;
 
+            if (data == null)
+            {
+                return;
+            }
+            
             foreach (var saveable in FindObjectsOfType<SaveableEntity>())
             {
                 if (data.TryGetValue(saveable.GetId(), out object value))
@@ -30,6 +54,11 @@ namespace ink.Save
                     saveable.LoadData(value);
                 }
             }
+        }
+
+        public void OnDisable()
+        {
+            saveGameEvent.RemoveListener(this);
         }
     }
 }
