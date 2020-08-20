@@ -9,7 +9,7 @@ namespace ink.Save
         public GameEventBase saveGameEvent;
         private SaveSystem saveSystem;
 
-        public void OnEnable()
+        private void Awake()
         {
             saveGameEvent.AddListener(this);
             saveSystem = new BinarySaveSystem();
@@ -56,7 +56,7 @@ namespace ink.Save
             }
         }
 
-        public void OnDisable()
+        public void OnDestroy()
         {
             saveGameEvent.RemoveListener(this);
         }
